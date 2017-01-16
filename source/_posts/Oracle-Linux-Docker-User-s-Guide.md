@@ -2,8 +2,8 @@
 title: Oracle Linux Docker User's Guide
 date: 2017-01-15 20:03:24
 tags:
-    - Docker
-    - Oracle
+  - docker
+  - oracle linux
 ---
 
 # Oracle Linux Docker User's Guide
