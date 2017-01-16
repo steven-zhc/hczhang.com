@@ -1,20 +1,19 @@
 ---
 title: Oracle Linux Docker User's Guide
 date: 2017-01-15 20:03:24
-tags:
+tags: 
   - docker
   - oracle linux
 ---
 
 # Oracle Linux Docker User's Guide
 
-[Offical Reference Doc](https://docs.oracle.com/cd/E52668_01/E75728/html/section_kfy_f2z_fp2.html)
+[Offical Reference Document](https://docs.oracle.com/cd/E52668_01/E75728/html/section_kfy_f2z_fp2.html)
 
 # Update system kernel
 
 The following commonds will run as root
 > sudo su -
-
 
 Add proxy
 ```bash

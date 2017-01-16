@@ -1,10 +1,7 @@
 ---
 title: GORM Query
 date: 2017-01-15 20:16:28
-tags:
-  - grails
-  - groovy
-  - gorm
+tags: [grails,groovy,gorm]
 ---
 
 ## Simple Query
