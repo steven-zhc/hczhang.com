@@ -11,6 +11,8 @@ def users = User.where {
 }.list(sort: "loginId", order: "desc")
 ```
 
+<!--more-->
+
 ## Operations could be used in query
 
 * !=, <, >, <=, >=

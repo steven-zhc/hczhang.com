@@ -10,6 +10,8 @@ tags:
 
 [Offical Reference Document](https://docs.oracle.com/cd/E52668_01/E75728/html/section_kfy_f2z_fp2.html)
 
+<!--more-->
+
 # Update system kernel
 
 The following commonds will run as root
