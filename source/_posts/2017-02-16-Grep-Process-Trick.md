@@ -8,6 +8,8 @@ tags: [shell]
 - grep process
 - !$
 
+<!--more-->
+
 ## grep process
 
 一个我们常用的命令
