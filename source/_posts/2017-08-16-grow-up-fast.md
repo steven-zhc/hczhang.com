@@ -1,7 +1,7 @@
 ---
 title: grow up fast
 date: 2017-08-16 03:19:36
-tags:
+tags: [journal]
 ---
 
 > 2017年8月16
