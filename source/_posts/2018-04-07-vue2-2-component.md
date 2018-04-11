@@ -4,7 +4,7 @@ date: 2018-04-07 20:39:51
 tags: [Javascript, Vue]
 ---
 
-#Simple Component
+# Simple Component
 ```html
 <!DOCTYPE html>
 <html>
@@ -36,7 +36,7 @@ new Vue({
 <html>
 <body>
     <div id="root">
-        <task-list></task-list>
+        <task-list title="my todo list"></task-list>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
