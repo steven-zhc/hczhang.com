@@ -1,5 +1,5 @@
 ---
-title: Vue2 2 component
+title: Vue2-2 component
 date: 2018-04-07 20:39:51
 tags: [Javascript, Vue]
 ---
