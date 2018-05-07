@@ -47,7 +47,6 @@ new Vue({
 
 # Inline template
 ```html
-```html
 <!DOCTYPE html>
 <html>
 <body>
