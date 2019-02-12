@@ -1,5 +1,5 @@
 ---
-title: Elastic Search 1
+title: Elastic Search - Getting Start 1
 date: 2018-10-10 17:39:35
 tags: [architecture, elastic]
 ---
@@ -21,6 +21,8 @@ tags: [architecture, elastic]
 - Used as primary data store
 
 > Elasticsearch is Robust, Highly Available, Distributed Search and Analytics Engine.
+
+<!--more-->
 
 # Goals
 
