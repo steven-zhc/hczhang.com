@@ -160,7 +160,7 @@ DELETE /my_moviews/movie/1
 
 ## Example
 
-2 nodes, 5 shareds and 1 replica
+2 nodes, 5 shards and 1 replica
 N = Primary shard
 R = Replica shard
 
