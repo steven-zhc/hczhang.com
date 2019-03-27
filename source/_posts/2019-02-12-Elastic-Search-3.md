@@ -138,7 +138,7 @@ The bool query allows us to compose smaller queries into bigger queries using bo
 
 the bool _must_ clause specifies all the queries that must be true for a document to be considered a match
 
-````bash
+```bash
 curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
    "query": {
@@ -151,8 +151,10 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
   }
 }
 '
+```
 
 composes two match queries and returns all accounts containing "mill" or "lane" in the address
+
 ```bash
 curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/json' -d'
 {
@@ -166,7 +168,7 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
   }
 }
 '
-````
+```
 
 Composes two match queries and returns all accounts that contain neither "mill" nor "lane" in the address
 
