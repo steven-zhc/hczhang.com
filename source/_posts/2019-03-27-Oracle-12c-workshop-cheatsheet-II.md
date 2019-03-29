@@ -4,8 +4,14 @@ date: 2019-03-27 13:39:35
 tags:
 ---
 
-
 This is a cheat sheet for Oracle 12C R2 workshop Part II
+
+Will conver those topics:
+
+- Storage space
+- Undo
+- Moving Data
+- Backup and Recovery
 
 <!--more-->
 
@@ -44,7 +50,7 @@ WHERE property_name = 'LOCAL_UNDO_ENABLED'
 
 ```
 
-Enable Local Undo Mode
+## Enable Local Undo Mode
 
 ```sql
 STARTUP UPGRADE
@@ -53,7 +59,7 @@ SHUTDOWN IMMEDIATE
 STARTUP
 ```
 
-Enable Temp Undo
+## Enable Temp Undo
 
 ```sql
 ALTER SESSION SET temp_undo_enabled = true;
@@ -297,7 +303,6 @@ RMAN> BACKUP TABLESPACE tbs_app;
 RMAN> LIST BACKUP;
 ```
 
-
 ## Recovery
 
 ```sql
@@ -320,7 +325,6 @@ RMAN> RESTORE DATABASE;
 -- restores and recovers the data file in one step
 RMAN> REPAIR PLUGGABLE DATABASE pdb1;
 ```
-
 
 # Monitor DB
 

@@ -6,34 +6,24 @@ tags:
 
 This is a cheat sheet for Oracle 12C R2 workshop Part I
 
+Will conver those topics:
+
+- EM
+- CBD
+- PDB
+- Network
+- User Security
+- Tablespaces
+
 <!--more-->
 
-# show
+# EM Express
 
 ```sql
--- the current container name
-SQL> SHOW con_name
-
--- current container id
-SQL> SHOW con_id
-
--- current user
-SQL> SHOW user
-```
-
-## show parameter
-
-```sql
-SQL> show parameter instance_name
-SQL> show parameter service_names
-```
-
-# V$
-
-```sql
-
--- List services
-SQL > select con_id, name from v$services;
+-- enable em and listen at https://localhost:5500/em.
+sqlplus / as sysdba
+SELECT dbms_xdb_config.gethttpsport() FROM dual;
+exec dbms_xdb_config.SetGlobalPortEnabled(TRUE);
 ```
 
 # CDB
@@ -97,11 +87,287 @@ SQL > ALTER SESSION SET CONTAINER = CDB$ROOT;
 ALTER PLUGGABLE DATABASE PDB1 OPEN;
 ```
 
-# lsnrctl
+## Create
+
+```sql
+-- Prepare folder
+$ mkdir $ORACLE_BASE/oradata/ORCL/PDB2
+$ sqlplus / as sysdba
+
+CREATE PLUGGABLE DATABASE PDB2 ADMIN USER PDB2ADMIN IDENTIFIED BY <password>
+ROLES=(dba)
+DEFAULT TABLESPACE USERS
+DATAFILE '/u01/app/oracle/oradata/ORCL/PDB2/users01.dbf'
+SIZE 250M AUTOEXTEND ON
+FILE_NAME_CONVERT=('/u01/app/oracle/oradata/ORCL/pdbseed/', '/u01/app/oracle/oradata/ORCL/PDB2/');
+
+-- Open it
+ALTER PLUGGABLE DATABASE PDB2 OPEN;
+
+-- Select service
+SQL> SELECT name FROM v$services;
+```
+
+## Clone
+
+```sql
+mkdir $ORACLE_BASE/oradata/ORCL/PDB3
+sqlplus / as sysdba
+
+CREATE PLUGGABLE DATABASE PDB3 FROM PDB1 CREATE_FILE_DEST= '/u01/app/oracle/oradata/ORCL/PDB3';
+ALTER PLUGGABLE DATABASE PDB3 OPEN;
+```
+
+## Unplugging and Plugging a PDB
+
+### Unplugging
+
+```sql
+ALTER PLUGGABLE DATABASE PDB3 CLOSE IMMEDIATE;
+
+ALTER PLUGGABLE DATABASE PDB3 UNPLUG INTO '/u01/app/oracle/oradata/PDB3.xml';
+
+DROP PLUGGABLE DATABASE PDB3 KEEP DATAFILES;
+```
+
+### check compatiable
+
+```sql
+SQL> set serveroutput on
+
+DECLARE
+compatible BOOLEAN := FALSE;
+BEGIN
+compatible := DBMS_PDB.CHECK_PLUG_COMPATIBILITY(
+           pdb_descr_file => '/u01/app/oracle/oradata/PDB3.xml');
+if compatible then
+DBMS_OUTPUT.PUT_LINE('PDB3 is compatible');
+else DBMS_OUTPUT.PUT_LINE('PDB3 is not compatible');
+end if;
+END;
+ /
+```
+
+### Plugging
+
+```sql
+CREATE PLUGGABLE DATABASE HRPDB USING '/u01/app/oracle/oradata/PDB3.xml' NOCOPY TEMPFILE REUSE;
+```
+
+## Drop
+
+```sql
+ALTER PLUGGABLE DATABASE HRPDB CLOSE;
+DROP PLUGGABLE DATABASE HRPDB INCLUDING DATAFILES;
+```
+
+# Database Instance
+
+## Lifecycle
+
+```sql
+SHUTDOWN
+SHUTDOWN ABORT
+SHUTDOWN IMMEDIATE
+
+STARTUP NOMOUNT;
+ALTER DATABASE MOUNT;
+ALTER DATABASE OPEN;
+ALTER PLUGGABLE DATABASE pdb1 OPEN;
+```
+
+## spfile/pfile
+
+Load order:
+
+1. spfile
+2. pfile
+
+```sql
+-- Locate the default spfile for your database instance
+SHOW PARAMETER spfile
+
+-- create pfile from spfile
+CREATE PFILE = 'initORCL.ora' FROM SPFILE;
+
+-- check spfile
+-- If the value is null, which means the database instance was started with a pfile.
+SHOW PARAMETER spfile
+```
+
+View parameters:
+
+- V$PARAMETER
+- V$SPPARAMETER
+- V$PARAMETER2
+- V$SYSTEM_PARAMETER
+
+```sql
+SHOW PARAMETER db_name
+SHOW PARAMETER db_domain
+SHOW PARAMETER db_recovery_file_dest
+SHOW PARAMETER sga
+SHOW PARAMETER undo_tablespace
+SHOW PARAMETER compatible
+SHOW PARAMETER control_files
+SHOW PARAMETER shared_pool_size
+SHOW PARAMETER db_block_size
+SHOW PARAMETER db_cache_size
+SHOW PARAMETER undo_management
+SHOW PARAMETER memory_target
+SHOW PARAMETER memory_max_target
+SHOW PARAMETER pga_aggregate_target
+```
+
+## Update
+
+```sql
+-- setup parameter
+ALTER SESSION SET nls_date_format = 'mon dd yyyy';
+
+-- update in both the database instance memory and in the spfile
+ALTER SYSTEM SET job_queue_processes=15 SCOPE=BOTH;
+```
+
+## Diagnostic
+
+```sql
+SELECT name, value FROM v$diag_info;
+```
+
+## adrci
 
 ```bash
+$ adrci
+adrci> SHOW ALERT
+
+# Find the retention policy values
+adrci> SET HOMEPATH diag/rdbms/orcl/ORCL
+adrci> SELECT sizep_policy FROM adr_control_aux;
+
+# Limit the target size for ADR ORCL diagnostics files to 200MB.
+adrci> SET CONTROL (SIZEP_POLICY = 200000000)
+adrci> SELECT sizep_policy FROM adr_control_aux;
+
+# purge the ADR down to 5MB
+# $ORACLE_BASE/diag/rdbms/orcl/ORCL
+adrci> PURGE -size 5000000
+```
+
+## Log DDL
+
+Target file: */u01/app/oracle/diag/rdbms/orcl/ORCL/log/ddl_ORCL.log*
+
+```sql
+-- check enable/disable
+SQL> SHOW PARAMETER enable_ddl_logging
+
+-- enable it
+SQL> ALTER SESSION SET enable_ddl_logging = TRUE;
+```
+
+# Networking
+
+Two files:
+
+- listeners.ora: lnsrctl used
+- tnsnames.ora: Network configuration file. 
+  - /u01/app/oracle/product/12.2.0/dbhome_1/network/admin/tnsnames.ora
+
+```sql
+SQL> SHOW PARAMETER INSTANCE_NAME
+SQL> SHOW PARAMETER SERVICE_NAMES
+SQL> SHOW PARAMETER LOCAL_LISTENER
+SQL> SHOW PARAMETER REMOTE_LISTENER
+```
+
+## lsnrctl
+
+```bash
+lsnrctl
+
+LSNRCTL> show current_listener
+LSNRCTL> status
+LSNRCTL> services
+
 
 ```
+
+## Dynamic Listener
+
+create a listener, named LISTENER2, that listens on the non-default port 1561 for all database
+services
+
+```bash
+# tnsnames.ora Network Configuration File
+LISTENER2 =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = 12cr2db.example.com)(PORT = 1561))
+
+LISTENER_ORCL =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = 12cr2db.example.com )(PORT = 1521))
+
+```
+
+```bash
+# listener.ora. used for tnsrctl
+LISTENER2 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 12cr2db.example.com)(PORT = 1561))
+  )
+ADR_BASE_LISTENER2 = /u01/app/oracle
+```
+
+```sql
+SQL> SHOW PARAMETER local_listener
+SQL> SELECT isses_modifiable, issys_modifiable FROM v$parameter WHERE name='local_listener';
+SQL> ALTER SYSTEM SET local_listener="LISTENER_ORCL,LISTENER2" SCOPE=BOTH;
+
+-- Start LISTENER2
+LSNRCTL> start LISTENER2
+```
+
+## Static Listener for a PDB
+
+create a listener named LISTENER_PDB1 that listens on the non-default port 1562 for the
+PDB1.example.com service
+
+```bash
+# listener.ora
+LISTENER_PDB1 =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 12cr2db.example.com)(PORT = 1562))
+      )
+SID_LIST_LISTENER_PDB1 =
+ (SID_LIST =
+    (SID_DESC =
+        (GLOBAL_DBNAME = PDB1.example.com)
+        (SID_NAME = ORCL)
+        (ORACLE_HOME = /u01/app/oracle/product/12.2.0/dbhome_1)
+    )
+)
+
+lsnrctl
+LSNRCTL> start LISTENER_PDB1
+```
+
+## TNS name
+
+$ORACLE_HOME/network/admin/tnsnames.ora
+
+```bash
+MYPDB1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 12cr2db.example.com)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = PDB1.example.com )
+    )
+)
+
+tnsping MyPDB1
+```
+
 
 # Privilege
 
@@ -199,26 +465,26 @@ DROP AUDIT POLICY drop_pol;
 
 # Tablespace
 
-## dictionary
+## Dictionary
 
 Tablespace information:
 
-* DBA_TABLESPACES
-* V$TABLESPACE
+- DBA_TABLESPACES
+- V$TABLESPACE
 
 Data file information:
 
-* DBA_DATA_FILES
-* V$DATAFILE
+- DBA_DATA_FILES
+- V$DATAFILE
 
 Temp file information:
 
-* DBA_TEMP_FILES
-* V$TEMPFILE
+- DBA_TEMP_FILES
+- V$TEMPFILE
 
 Tables in a tablespace:
 
-* ALL_TABLES
+- ALL_TABLES
 
 ```sql
 -- list tablespaces
@@ -243,7 +509,7 @@ SELECT index_name FROM all_indexes WHERE tablespace_name='SYSAUX' AND owner='HR'
 
 ```
 
-## maintain
+## Maintain
 
 ```sql
 -- Create tablespace
