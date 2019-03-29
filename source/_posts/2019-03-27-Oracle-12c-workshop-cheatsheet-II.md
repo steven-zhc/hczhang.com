@@ -1,7 +1,7 @@
 ---
 title: Oracle 12c workshop cheatsheet II
 date: 2019-03-27 13:39:35
-tags:
+tags: [database]
 ---
 
 This is a cheat sheet for Oracle 12C R2 workshop Part II

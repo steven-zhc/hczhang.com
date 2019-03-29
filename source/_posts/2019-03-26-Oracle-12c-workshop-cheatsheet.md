@@ -1,7 +1,7 @@
 ---
 title: Oracle 12c workshop cheatsheet
 date: 2019-03-26 11:00:30
-tags:
+tags: [database]
 ---
 
 This is a cheat sheet for Oracle 12C R2 workshop Part I
@@ -367,7 +367,6 @@ MYPDB1 =
 
 tnsping MyPDB1
 ```
-
 
 # Privilege
 
