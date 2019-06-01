@@ -4,9 +4,10 @@ date: 2019-02-12 11:36:15
 tags: [architecture, elastic]
 ---
 
-# Health API
+# 1. Health API
 
-Health Check
+## Health Check
+
 ```bash
 curl -X GET "http://{{host}}:9200/_cat/health?v"
 ```
@@ -18,63 +19,67 @@ curl -X GET "http://{{host}}:9200/_cat/health?v"
 
 <!--more-->
 
-List Nodes
+## List Nodes
 
 ```bash
 curl "http://{{host}}:9200/_cat/nodes?v"
 ```
 
-# Indices API
+# 2. Indices API
 
-## List
+## 2.1 List
 
 ```bash
 curl "http://{{host}}:9200/_cat/indices?v"
 ```
 
-## Create
+## 2.2 Create
 
 ```bash
 curl -X PUT "http://{{host}}:9200/customer?pretty"
 curl "http://{{host}}:9200/_cat/indices?v"
 ```
 
-## Delete
+## 2.3 Delete
 
 ```bash
 curl -X DELETE "http://{{host}}:9200/customer?pretty"
 curl "http://{{host}}:9200/_cat/indices?v"
 ```
 
-# Document API
+# 3. Document API
 
-## Query
+## 3.1 Query
 
 ```bash
-curl "http://{{host}}:9200/customer/_doc/1?pretty"
+curl "http://{{host}}:9200/movies/movie/1"
+
+curl "http://{{host}}:9200/movies/_search?q=Dark"
 ```
 
-## Create and Update Index
+have another posts talk about **query**
+
+## 3.2 Create
 
 ```bash
-curl -X PUT "http://{{host}}:9200/customer/_doc/1?pretty" -H 'Content-Type: application/json' -d '{ "name": "John Doe" }'
-curl "http://{{host}}:9200/customer/_doc/1?pretty"
+curl -X PUT "http://{{host}}:9200/movies/movie/109487" -H 'Content-Type: application/json' -d '{ "genre": ["IMAX", "Sci-Fi"], "title": "Interstellar", "year": 2014 }'
+curl "http://{{host}}:9200/movies/movie/109487"
 ```
 
-Create with generated ID
+## 3.3 Update
 
 ```bash
-curl -X POST "http://{{host}}:9200/customer/_doc?pretty" -H 'Content-Type: application/json' -d '{ "name": "Jane Doe" }'
+curl -X POST "http://{{host}}:9200/movies/movie/109487/_update" -H 'Content-Type: application/json' -d '{ "doc": { "title": "Interstellar" } }'
 ```
 
-## Update
+Every document has a _version field
+Elasticsearch documents are immutable.
+
+- a new document is created with an incremented _version
+- the old doc is marked for deletion
+
+## 3.4 Delete
 
 ```bash
-curl -X POST "http://{{host}}:9200/customer/_doc/1?pretty" -H 'Content-Type: application/json' -d '{ "doc": { "name": "Jane Doe", "age": 20 } }'
-```
-
-## Delete
-
-```bash
-curl -X DELETE "http://{{host}}:9200/customer/_doc/2?pretty"
+curl -X DELETE "http://{{host}}:9200/movies/movie/109487"
 ```

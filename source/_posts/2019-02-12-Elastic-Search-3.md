@@ -4,7 +4,7 @@ date: 2019-02-12 13:41:26
 tags: [architecture, elastic]
 ---
 
-# Search API
+# 1. Search API
 
 - sending search parameters through the _REST request URI_
 - sending search parameters through the _REST request body_
@@ -37,7 +37,7 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
 '
 ```
 
-# Query language
+# 2. Query language
 
 Search all
 
@@ -76,7 +76,7 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
 '
 ```
 
-# Populate Search
+# 3. Populate Search
 
 Return two fields, account_number and balance (inside of \_source)
 
@@ -206,7 +206,7 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
 '
 ```
 
-# Filter
+# 4. Filter
 
 ```bash
 curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/json' -d'
@@ -228,7 +228,7 @@ curl -X GET "http://{{host}}:9200/bank/_search" -H 'Content-Type: application/js
 '
 ```
 
-# Aggregations
+# 5. Aggregations
 
 We set size=0 to not show search hits because we only want to see the aggregation results in the response.
 

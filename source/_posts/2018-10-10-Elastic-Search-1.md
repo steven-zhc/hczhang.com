@@ -4,7 +4,7 @@ date: 2018-10-10 17:39:35
 tags: [architecture, elastic]
 ---
 
-# Overview
+# 1. Overview
 
 ## Upside
 
@@ -24,7 +24,7 @@ tags: [architecture, elastic]
 
 <!--more-->
 
-# Goals
+# 2. Goals
 
 - Lightning Fast Search
   - Scalable
@@ -41,15 +41,33 @@ tags: [architecture, elastic]
   - Search API: localhost:9000/index_search?q=*&pretty
   - DSL
 
-# Install
+# 3. Install
 
-- Elastic Search
-- Kibana
-  - http://localhost:5601
+```yaml
+version: '3'
 
-# Terms
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.7.1
+    ports:
+      - "5601:5601"
+```
 
-## Compare to RDBMS
+# 4. Terms
+
+## 4.1 Compare to RDBMS
 
 | Relationship DB | Elasticsearch |
 | - | - |
@@ -58,7 +76,7 @@ tags: [architecture, elastic]
 | row | document |
 | column | field |
 
-## Index
+## 4.2 Index
 
 > An Index is a Logical Namespace that points to 1 or more Shards in an Elasticsearch Cluster
 
@@ -79,7 +97,7 @@ http http://slc10vfs:9200/my_test_index?pretty
 http DELETE http://slc10vfs:9200/my_test_index
 ```
 
-## Type
+## 4.3 Type
 
 > A Representation of a class of similar Documents
 
@@ -89,26 +107,51 @@ For example
 
 One type per index
 
-## Document
+## 4.4 Document
 
 > A Document in Elasticsearch is an Individual Entry that is the Primary method for adding data.
 
-## Field
+## 4.5 Field
 
 > A Field is an Individual Entry in an Elasticsearch Document
 
-## Example
+## 4.6 Example
 
 | Object | Elasticsearch |
 | - | - |
-| Entertainment | index |
-| Movies | type |
-| Movie | document |
+| Movies | index |
+| Movie | type |
+| Row   | Document  |
 | TITLE :: "text" | field |
 | RATING :: "keyword" | field |
 | ACTOR_COUNT :: "int" | field |
 
-### Kibana
+## 4.7 Mapping
+
+A mapping is a schema definition
+
+- field types
+  - text, keyword, byte, short, integer, long, float, double, boolean, date
+- field index
+  - do you want this field to be queryable? ture/false
+- field analyzer
+  - define our tokenizer and token filter. standard / whitespace / simple/ english
+    - characher filters: remove html encoding convert & to and
+    - tokenizer: split strings on whitespace / punctuation/ non-letter
+    - token filter: lowercasing, stemming, synonyms, stopwords
+    - standard: splits on word boundaries
+    - simple: splits on anything isn't a letter, and lowercases
+    - whitespace: splits on whitespace but doesn't lowercase
+    - language: i.e. engligh. accounts for language-specific stopwords and stemming
+
+### analyzer
+
+Sometimes text fields should be exact-match
+
+- use **keyword** mapping type to suppress analyzing (eact match only)
+- use **text** type to allow analyzing
+
+search on analyzed field will return anything remotely relevent
 
 ```json
 PUT my_movies
@@ -116,23 +159,20 @@ PUT my_movies
     "mappings": {
         "movie": {
             "properties": {
-                "name": {
-                    "type":"text"
-                },
-                "actor_count": {
-                    "type":"integer"
-                },
-                "date": {
-                    "type":"date"
-                }
+                "id": { "type":"text" },
+                "year": { "type":"date" },
+                "genre": { "type": "keyword" },
+                "title": { "type": "text", "analyzer": "english"}
             }
         }
     }
 }
+
+curl http://{{host}}:9200/movies/_mapping/movie
 ```
 
 ```json
-PUT /my_moviews/movie/1/_create
+PUT /my_moviews/movie/1
 {
     "name": "Example Movie One",
     "actor_count": 10,
@@ -144,7 +184,7 @@ PUT /my_moviews/movie/1/_create
 DELETE /my_moviews/movie/1
 ```
 
-# Shards and Replicas
+# 5. Shards and Replicas
 
 ## Shards
 
@@ -193,7 +233,7 @@ PUT test_index/_settings
 - Cannot set shards after created
 - But could change replicas
 
-# Bulk API
+# 6. Bulk API
 
 Allows you to index multiple documents at one time.
 
@@ -203,14 +243,22 @@ POST my_movies/_bulk
 {"name":"Sample Movie 2","actor_count":9,"date":"2015-01-10"}
 ```
 
-# REST Queries
+```bash
+curl -XPUT 127.0.0.1:9200/_bulk --data-binary @movies.json
+
+$ cat movies.json
+{ "create" : { "_index" : "movies", "_type" : "movie", "_id" : "135569" } }
+{ "id": "135569", "title" : "Star Trek Beyond", "year":2016 , "genre":["Action", "Adventure", "Sci-Fi"] }
+```
+
+# 7. REST Queries
 
 | DB | Verb |
 | - | - |
 | Create | POST |
 | Read | GET |
-Update | POST (partial) / PUT (whole)
-Delete | Delete
+| Update | POST (partial) / PUT (whole)
+| Delete | Delete
 
 `curl -X <VERB> '<PROTOCOL>://<HOST>:<PORT>/<PATH>?<QUERY_STRING>' -d '<BODY>'`
 
@@ -218,5 +266,6 @@ Delete | Delete
 curl -XGET http://localhost:9200/INDEX_NAME/_search?q=name:John
 
 # Shorthand version
+# could be runnable in kibana
 GET /INDEX_NAME/_search?q=name:John
 ```
