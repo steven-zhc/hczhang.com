@@ -23,7 +23,6 @@ data List a = Nil | Cons a (List a)
 
 ```
 
-
 ## newtype
 
 Newtypes must define exactly one constructor, and that constructor must take exactly one argument.
@@ -35,7 +34,7 @@ newtype Pixels = Pixels Number
 # Chapter 7
 
 ```purescript
--- <?>
+-- <$>
 class Functor f where
   map :: forall a b. (a -> b) -> f a -> f b
 
@@ -80,6 +79,45 @@ withError (Just a) _   = Right a
 
 fullNameEither first middle last =
    fullName <$> (first  `withError` "First name was missing")
-            <*> (middle `withError` "Middle name was missing")            <*> (last   `withError` "Last name was missing")
+            <*> (middle `withError` "Middle name was missing")
+            <*> (last   `withError` "Last name was missing")
+```
+
+# Chapter 8
+
+## 8.4 Monad type class
+
+```purescript
+-- >>=
+class Apply m <= Bind m where
+    bind :: forall a b. m a -> (a -> m b) -> m b
+
+class (Applicative m, Bind m) <= Monad m
+
+instance bindArray :: Bind Array where
+    bind xs f = concatMap f xs
+
+instance bindMaybe :: Bind Maybe where
+    bind Nothing  _ = Nothing
+    bind (Just a) f = f a
+```
+
+## 8.5 Monad Laws
+
+```haskell
+-- Left identity
+return a >>= f ≡ f a
+
+-- Right identity
+m >>= return ≡ m
+
+-- Associativity
+(m >>= f) >>= g ≡ m >>= (\x -> f x >>= g)
+```
+
+## 8.6 Folding With Monads
+
+```purescript
+fordM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
 ```
 
