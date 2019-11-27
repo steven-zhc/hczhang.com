@@ -1,8 +1,13 @@
 ---
-title: purescript note
+title: Purescript Note
 date: 2019-11-02 17:51:06
 tags: [purescript, fp]
 ---
+
+Notebook for *PureScript by Example*
+<https://leanpub.com/purescript/read#leanpub-auto-functions-and-records>
+
+<!--more-->
 
 # Chapter 5
 
@@ -31,7 +36,7 @@ Newtypes must define exactly one constructor, and that constructor must take exa
 newtype Pixels = Pixels Number
 ```
 
-# Chapter 7
+# Chapter 7 Applicative Validation
 
 ```purescript
 -- <$>
@@ -55,8 +60,6 @@ instance applyMaybe :: Apply Maybe where
   apply (Just f) (Just x) = Just (f x)
   apply _        _        = Nothing
 ```
-
-<!--more-->
 
 ## lift
 
@@ -83,7 +86,7 @@ fullNameEither first middle last =
             <*> (last   `withError` "Last name was missing")
 ```
 
-# Chapter 8
+# Chapter 8 The Eff Monad
 
 ## 8.4 Monad type class
 
@@ -118,6 +121,67 @@ m >>= return ≡ m
 ## 8.6 Folding With Monads
 
 ```purescript
-fordM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
+foldM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
+foldM _ a Nil = pure a
+foldM f a (b : bs) = do
+  a' <- f a b
+  foldM f a' bs
 ```
 
+Example:
+
+```purescript
+import Data.List
+
+safeDivide :: Int -> Int -> Maybe Int
+safeDivide _ 0 = Nothing
+safeDivide a b = Just (a / b)
+
+-- (Just 5)
+foldM safeDivide 100 (fromFoldable [5, 2, 2]) 
+
+-- Nothing
+foldM safeDivide 100 (fromFoldable [2, 0, 4])
+```
+
+## 8.7 Monads and Applicatives
+
+> Every instance of the Monad type class is also an instance of the Applicative type class
+
+## 8.8 Native Effects
+
+> The Eff monad is defined in the Prelude, in the Control.Monad.Eff module. It is used to manage so-called native side-effects.
+
+## 8.9 Side-Effects and Purity
+
+> The answer is that PureScript does not aim to eliminate side-effects. It aims to represent side-effects in such a way that pure computations can be distinguished from computations with side-effects in the type system. In this sense, the language is still pure.
+
+> *main* is required to be a computation in the Eff monad
+
+## 8.10 The Eff Monad
+
+Simple example.
+
+This program uses do notation to combine two types of native effects provided by the Javascript runtime: random number generation and console IO.
+
+```purescript
+module Main where
+
+import Prelude
+
+import Control.Monad.Eff.Random (random)
+import Control.Monad.Eff.Console (logShow)
+
+main = do
+  n <- random
+  logShow n
+```
+
+## 8.11 Extensible Effects
+
+```purescript
+> :type main
+forall eff. Eff (console :: CONSOLE, random :: RANDOM | eff) Unit
+```
+
+main is a computation with side-effects, which can be run in any environment which supports random number generation and console IO, and any other types of side effect, and which returns a value of type Unit
