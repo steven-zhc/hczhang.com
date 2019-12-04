@@ -147,8 +147,127 @@ filter filterEntry >>> head
 
 # Chapter 4 Recursion, Maps And Folds
 
+- purescript-maybe, which defines the Maybe type constructor
+- purescript-arrays, which defines functions for working with arrays
+- purescript-strings, which defines functions for working with Javascript strings
+- purescript-foldable-traversable, which defines functions for folding arrays and other data structures
+- purescript-console, which defines functions for printing to the console
 
-# Chapter 5
+## 4.4 Recursion on Array
+
+- The null function returns true on an empty array
+
+```purescript
+import Prelude
+
+import Data.Array (null)
+import Data.Array.Partial (tail)
+import Partial.Unsafe (unsafePartial)
+
+length :: forall a. Array a -> Int
+length arr =
+  if null arr
+    then 0
+    else 1 + length (unsafePartial tail arr)
+```
+
+## 4.6 Infix Operators
+
+```purescript
+> (\n -> n + 1) `map` [1, 2, 3, 4, 5]
+[2, 3, 4, 5, 6]
+
+> (\n -> n + 1) <$> [1, 2, 3, 4, 5]
+[2, 3, 4, 5, 6]
+
+> (<$>) (\n -> n + 1) [1, 2, 3, 4, 5]
+[2, 3, 4, 5, 6]
+```
+
+## 4.8 Flattening Arrays
+
+```purescript
+> import Data.Array
+
+> :type concat
+forall a. Array (Array a) -> Array a
+
+> concat [[1, 2, 3], [4, 5], [6]]
+[1, 2, 3, 4, 5, 6]
+
+> :type concatMap
+forall a b. (a -> Array b) -> Array a -> Array b
+
+> concatMap (\n -> [n, n * n]) (1 .. 5)
+[1,1,2,4,3,9,4,16,5,25]
+```
+
+## 4.10 Do Notation
+
+**map** and **bind** allow us to write so-called **monad comprehensions**
+
+```purescript
+factors :: Int -> Array (Array Int)
+factors n = filter (\xs -> product xs == n) $ do
+  i <- 1 .. n
+  j <- i .. n
+  pure [i, j]
+```
+
+## 4.11 Guards
+
+```purescript
+import Control.MonadZero (guard)
+
+factors :: Int -> Array (Array Int)
+factors n = do
+  i <- 1 .. n
+  j <- i .. n
+  guard $ i * j == n
+  pure [i, j]
+
+> import Control.MonadZero
+
+> :type guard
+forall m. MonadZero m => Boolean -> m Unit
+
+> length $ guard true
+1
+
+> length $ guard false
+0
+```
+
+That is, if guard is passed an expression which evaluates to true, then it returns an array with a single element. If the expression evaluates to false, then its result is empty.
+
+## 4.12 Folds
+
+```purescript
+> :type foldl
+forall a b. (b -> a -> b) -> b -> Array a -> b
+
+> :type foldr
+forall a b. (a -> b -> b) -> b -> Array a -> b
+
+> foldl (+) 0 (1 .. 5)
+15
+```
+
+## 4.13 Tail Recursion
+
+**purescript-free** and **purescript-tailrec** packages.
+
+```purescript
+fact :: Int -> Int -> Int
+fact 0 acc = acc
+fact n acc = fact (n - 1) (acc * n)
+```
+
+Notice that the recursive call to fact is the last thing that happens in this function - it is in tail position.
+
+Prefer Folds to Explicit Recursion
+
+# Chapter 5 Pattern Matching
 
 ## 5.12 Algebraic Data Types
 
