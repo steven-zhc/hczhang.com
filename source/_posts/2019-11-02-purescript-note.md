@@ -9,6 +9,145 @@ Notebook for *PureScript by Example*
 
 <!--more-->
 
+# Chapter 2 Getting Started
+
+```purescript
+module Main where
+
+import Control.Monad.Eff.Console
+
+main = log "Hello, World!"
+```
+
+# Chapter 3 Functions and Records
+
+## 3.3 Simple Types
+
+Built-in types
+
+- Number
+- String
+- Boolean
+- integers
+- characters
+- arrays
+- records
+- functions
+
+```purescript
+> :type [1, 2, 3]
+Array Int
+```
+
+Fuction
+
+```purescript
+add :: Int -> Int -> Int
+add x y = x + y
+
+> add 10 20
+30
+```
+
+## 3.4 Quantified Types
+
+```purescript
+> :type flip
+forall a b c. (a -> b -> c) -> b -> a -> c
+```
+
+forall means universally quantified type
+
+## 3.5 Notes On Indentation
+
+PureScript code is indentation-sensitive
+
+## 3.6 Defining Our Types
+
+```purescript
+-- a record type
+type Entry =
+  { firstName :: String
+  , lastName  :: String
+  , address   :: Address
+  }
+type Address =
+  { street :: String
+  , city   :: String
+  , state  :: String
+  }
+
+-- type synonym
+type AddressBook = List Entry
+
+> address = { street: "123 Fake St.", city: "Faketown", state: "CA" }
+```
+
+## 3.7 Type Constructors and Kinds
+
+**List** is an example of a type constructor.
+
+Values do not have the type List directly, but rather **List a** for some type **a**. That is, **List** takes a type argument a and constructs a new type List a.
+
+values are distinguished by their **types**, types are distinguished by their **kinds**
+
+```purescript
+> :kind Number
+Type
+
+> import Data.List
+> :kind List
+Type -> Type
+
+> :kind List String
+Type
+```
+
+## 3.11 Curried Functions
+
+Functions in PureScript take exactly one argument.
+
+## 3.12 Querying the Address Book
+
+```purescript
+findEntry firstName lastName book = head $ filter filterEntry book
+  where
+    filterEntry :: Entry -> Boolean
+    filterEntry entry = entry.firstName == firstName && entry.lastName == lastName
+```
+
+Note that, just like for top-level declarations, it was not necessary to specify a type signature for filterEntry. However, doing so is recommended as a form of documentation.
+
+## 3.13 Infix Function Application
+
+> head $ filter filterEntry book
+
+is equals
+
+> head (filter filterEntry book)
+
+($) is just an alias for a regular function called apply
+
+```purescript
+apply :: forall a b. (a -> b) -> a -> b
+apply f x = f x
+
+infixr 0 apply as $
+```
+
+## 3.14 Function Composition
+
+- **<<<** backwards composition
+- **>>>** forwards composition
+
+```purescript
+(head <<< filter filterEntry) book
+filter filterEntry >>> head
+```
+
+# Chapter 4 Recursion, Maps And Folds
+
+
 # Chapter 5
 
 ## 5.12 Algebraic Data Types
