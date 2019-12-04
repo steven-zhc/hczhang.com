@@ -269,11 +269,112 @@ Prefer Folds to Explicit Recursion
 
 # Chapter 5 Pattern Matching
 
+- **purescript-globals**, which provides access to some common JavaScript values and functions.
+- **purescript-math**, which provides access to the JavaScript Math module.
+
+## 5.3 Simple Pattern Matching
+
+```purescript
+gcd :: Int -> Int -> Int
+gcd n 0 = n
+gcd 0 m = m
+gcd n m = if n > m
+            then gcd (n - m) m
+            else gcd n (m - n)
+```
+
+- Number, String, Char and Boolean literals
+- Wildcard patterns, indicated with an underscore (_), which match any argument, and which do not bind any names.
+
+## 5.5 Guards
+
+```purescript
+gcd :: Int -> Int -> Int
+gcd n 0 = n
+gcd 0 n = n
+gcd n m | n > m     = gcd (n - m) m
+        | otherwise = gcd n (m - n)
+```
+
+## 5.6 Array Patterns
+
+```purescript
+isEmpty :: forall a. Array a -> Boolean
+isEmpty [] = true
+isEmpty _ = false
+
+takeFive :: Array Int -> Int
+takeFive [0, 1, a, b, _] = a * b
+takeFive _ = 0
+```
+
+## 5.7 Record Patterns and Row Polymorphism
+
+```purescript
+showPerson :: { first :: String, last :: String } -> String
+showPerson { first: x, last: y } = y <> ", " <> x
+
+> :type showPerson
+forall r. { first :: String, last :: String | r } -> String
+
+> showPerson { first: "Phil", last: "Freeman" }
+"Freeman, Phil"
+
+> showPerson { first: "Phil", last: "Freeman", location: "Los Angeles" }
+"Freeman, Phil"
+```
+
+Notice: what is the type variable r here?
+> We can read the new type signature of showPerson as “takes any record with first and last fields which are Strings and any other fields, and returns a String”.
+
+This function is polymorphic in the row r of record fields, hence the name row polymorphism.
+
+## 5.8 Nested Patterns
+
+```purescript
+type Address = { street :: String, city :: String }
+
+type Person = { name :: String, address :: Address }
+
+livesInLA :: Person -> Boolean
+livesInLA { address: { city: "Los Angeles" } } = true
+livesInLA _ = false
+```
+
+## 5.9 Named Patterns
+
+```purescript
+sortPair :: Array Int -> Array Int
+sortPair arr@[x, y]
+  | x <= y = arr
+  | otherwise = [y, x]
+sortPair arr = arr
+```
+
+## 5.10 Case Expressions
+
+```purescript
+import Data.Array.Partial (tail)
+import Partial.Unsafe (unsafePartial)
+
+lzs :: Array Int -> Array Int
+lzs [] = []
+lzs xs = case sum xs of
+           0 -> xs
+           _ -> lzs (unsafePartial tail xs)
+```
+
 ## 5.12 Algebraic Data Types
 
 Algebraic Data Types (or ADTs)
 
 ```purescript
+data Shape
+  = Circle Point Number
+  | Rectangle Point Number Number
+  | Line Point Point
+  | Text Point String
+
 data Point = Point
   { x :: Number
   , y :: Number
@@ -283,16 +384,37 @@ data Maybe a = Nothing | Just a
 
 -- recursive define
 data List a = Nil | Cons a (List a)
-
 ```
 
-## newtype
+## 5.13 Using ADTs
+
+```purescript
+showPoint :: Point -> String
+showPoint (Point { x: x, y: y }) = "(" <> show x <> ", " <> show y <> ")"
+
+-- or we could define as below. Record Puns
+-- showPoint (Point { x, y }) = ...
+
+showShape :: Shape -> String
+showShape (Circle c r)      = ...
+showShape (Rectangle c w h) = ...
+showShape (Line start end)  = ...
+showShape (Text p text) = ...
+```
+
+## 5.15 Newtypes
+
+There is an important special case of **algebraic data types (ADT)**, called newtypes
 
 Newtypes must define exactly one constructor, and that constructor must take exactly one argument.
+
+a newtype gives a new name to an existing type. In fact, the values of a newtype have the same runtime representation as the underlying type. This gives an extra layer of type safety.
 
 ```purescript
 newtype Pixels = Pixels Number
 ```
+
+> Newtypes will become important, since they allow us to attach different behavior to a type without changing its representation at runtime.
 
 # Chapter 7 Applicative Validation
 
