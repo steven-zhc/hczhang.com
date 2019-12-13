@@ -11,7 +11,7 @@ Notebook for *PureScript by Example*
 
 # Chapter 2 Getting Started
 
-```purescript
+```haskell
 module Main where
 
 import Control.Monad.Eff.Console
@@ -34,14 +34,14 @@ Built-in types
 - records
 - functions
 
-```purescript
+```haskell
 > :type [1, 2, 3]
 Array Int
 ```
 
 Fuction
 
-```purescript
+```haskell
 add :: Int -> Int -> Int
 add x y = x + y
 
@@ -51,7 +51,7 @@ add x y = x + y
 
 ## Quantified Types (3.4)
 
-```purescript
+```haskell
 > :type flip
 forall a b c. (a -> b -> c) -> b -> a -> c
 ```
@@ -64,7 +64,7 @@ PureScript code is indentation-sensitive
 
 ## Defining Our Types (3.6)
 
-```purescript
+```haskell
 -- a record type
 type Entry =
   { firstName :: String
@@ -91,7 +91,7 @@ Values do not have the type List directly, but rather **List a** for some type *
 
 values are distinguished by their **types**, types are distinguished by their **kinds**
 
-```purescript
+```haskell
 > :kind Number
 Type
 
@@ -109,7 +109,7 @@ Functions in PureScript take exactly one argument.
 
 ## Querying the Address Book (3.12)
 
-```purescript
+```haskell
 findEntry firstName lastName book = head $ filter filterEntry book
   where
     filterEntry :: Entry -> Boolean
@@ -128,7 +128,7 @@ is equals
 
 ($) is just an alias for a regular function called apply
 
-```purescript
+```haskell
 apply :: forall a b. (a -> b) -> a -> b
 apply f x = f x
 
@@ -140,7 +140,7 @@ infixr 0 apply as $
 - **<<<** backwards composition
 - **>>>** forwards composition
 
-```purescript
+```haskell
 (head <<< filter filterEntry) book
 filter filterEntry >>> head
 ```
@@ -157,7 +157,7 @@ filter filterEntry >>> head
 
 - The null function returns true on an empty array
 
-```purescript
+```haskell
 import Prelude
 
 import Data.Array (null)
@@ -173,7 +173,7 @@ length arr =
 
 ## Infix Operators (4.6)
 
-```purescript
+```haskell
 > (\n -> n + 1) `map` [1, 2, 3, 4, 5]
 [2, 3, 4, 5, 6]
 
@@ -186,7 +186,7 @@ length arr =
 
 ## Flattening Arrays (4.8)
 
-```purescript
+```haskell
 > import Data.Array
 
 > :type concat
@@ -206,7 +206,7 @@ forall a b. (a -> Array b) -> Array a -> Array b
 
 **map** and **bind** allow us to write so-called **monad comprehensions**
 
-```purescript
+```haskell
 factors :: Int -> Array (Array Int)
 factors n = filter (\xs -> product xs == n) $ do
   i <- 1 .. n
@@ -216,7 +216,7 @@ factors n = filter (\xs -> product xs == n) $ do
 
 ## Guards (4.11)
 
-```purescript
+```haskell
 import Control.MonadZero (guard)
 
 factors :: Int -> Array (Array Int)
@@ -242,7 +242,7 @@ That is, if guard is passed an expression which evaluates to true, then it retur
 
 ## Folds (4.12)
 
-```purescript
+```haskell
 > :type foldl
 forall a b. (b -> a -> b) -> b -> Array a -> b
 
@@ -257,7 +257,7 @@ forall a b. (a -> b -> b) -> b -> Array a -> b
 
 **purescript-free** and **purescript-tailrec** packages.
 
-```purescript
+```haskell
 fact :: Int -> Int -> Int
 fact 0 acc = acc
 fact n acc = fact (n - 1) (acc * n)
@@ -274,7 +274,7 @@ Prefer Folds to Explicit Recursion
 
 ## Simple Pattern Matching (5.3)
 
-```purescript
+```haskell
 gcd :: Int -> Int -> Int
 gcd n 0 = n
 gcd 0 m = m
@@ -288,7 +288,7 @@ gcd n m = if n > m
 
 ## Guards (5.5)
 
-```purescript
+```haskell
 gcd :: Int -> Int -> Int
 gcd n 0 = n
 gcd 0 n = n
@@ -298,7 +298,7 @@ gcd n m | n > m     = gcd (n - m) m
 
 ## Array Patterns (5.6)
 
-```purescript
+```haskell
 isEmpty :: forall a. Array a -> Boolean
 isEmpty [] = true
 isEmpty _ = false
@@ -310,7 +310,7 @@ takeFive _ = 0
 
 ## Record Patterns and Row Polymorphism (5.7)
 
-```purescript
+```haskell
 showPerson :: { first :: String, last :: String } -> String
 showPerson { first: x, last: y } = y <> ", " <> x
 
@@ -331,7 +331,7 @@ This function is polymorphic in the row r of record fields, hence the name row p
 
 ## Nested Patterns (5.8)
 
-```purescript
+```haskell
 type Address = { street :: String, city :: String }
 
 type Person = { name :: String, address :: Address }
@@ -343,7 +343,7 @@ livesInLA _ = false
 
 ## Named Patterns (5.9)
 
-```purescript
+```haskell
 sortPair :: Array Int -> Array Int
 sortPair arr@[x, y]
   | x <= y = arr
@@ -353,7 +353,7 @@ sortPair arr = arr
 
 ## Case Expressions (5.10)
 
-```purescript
+```haskell
 import Data.Array.Partial (tail)
 import Partial.Unsafe (unsafePartial)
 
@@ -368,7 +368,7 @@ lzs xs = case sum xs of
 
 Algebraic Data Types (or ADTs)
 
-```purescript
+```haskell
 -- OR
 data Shape
   = Circle Point Number
@@ -390,7 +390,7 @@ data List a = Nil | Cons a (List a)
 
 ## Using ADTs (5.13)
 
-```purescript
+```haskell
 showPoint :: Point -> String
 showPoint (Point { x: x, y: y }) = "(" <> show x <> ", " <> show y <> ")"
 
@@ -412,7 +412,7 @@ Newtypes must define exactly one constructor, and that constructor must take exa
 
 a newtype gives a new name to an existing type. In fact, the values of a newtype have the same runtime representation as the underlying type. This gives an extra layer of type safety.
 
-```purescript
+```haskell
 newtype Pixels = Pixels Number
 ```
 
@@ -422,7 +422,7 @@ newtype Pixels = Pixels Number
 
 ## Show Me (6.3)
 
-```purescript
+```haskell
 class Show a where
   show :: a -> String
 
@@ -433,14 +433,14 @@ instance showBoolean :: Show Boolean where
 
 We can annotate the expression with a type, using the :: operator, so that PSCi can choose the correct type class instance:
 
-```purescript
+```haskell
 > show (Left 10 :: Either Int String)
 "(Left 10)"
 ```
 
 ## Common Type Classes (6.4)
 
-```purescript
+```haskell
 class Eq a where
   eq :: a -> a -> Boolean
 
@@ -475,7 +475,7 @@ class Functor f where
   map :: forall a b. (a -> b) -> f a -> f b
 ```
 
-```purescript
+```haskell
 > import Data.Monoid
 > import Data.Foldable
 
@@ -490,7 +490,7 @@ Functor Law
 
 ## Type Annotations (6.5)
 
-```purescript
+```haskell
 threeAreEqual :: forall a. Eq a => a -> a -> a -> Boolean
 threeAreEqual a1 a2 a3 = a1 == a2 && a2 == a3
 
@@ -505,14 +505,14 @@ showCompare a1 a2 =
 
 ## Instance Dependencies (6.7)
 
-```purescript
+```haskell
 instance showEither :: (Show a, Show b) => Show (Either a b) where
   ...
 ```
 
 ## Multi Parameter Type Classes (6.8)
 
-```purescript
+```haskell
 module Stream where
 
 import Data.Array as Array
@@ -531,7 +531,7 @@ instance streamString :: Stream String Char where
 
 ## Functional Dependencies (6.9)
 
-```purescript
+```haskell
 class Stream stream element | stream -> element where
   uncons :: stream -> Maybe { head :: element, tail :: stream }
 
@@ -546,7 +546,7 @@ forall stream element. Stream stream element => stream -> Maybe stream
 
 ## Nullary Type Classes (6.10)
 
-```purescript
+```haskell
 head :: forall a. Partial => Array a -> a
 
 tail :: forall a. Partial => Array a -> Array a
@@ -554,12 +554,12 @@ tail :: forall a. Partial => Array a -> Array a
 
 Note that there is no instance defined for the Partial type class! Doing so would defeat its purpose: attempting to use the head function directly will result in a type error:
 
-```purescript
+```haskell
 secondElement :: forall a. Partial => Array a -> a
 secondElement xs = head (tail xs)
 ```
 
-```purescript
+```haskell
 unsafePartial :: forall a. (Partial => a) -> a
 ```
 Note that the Partial constraint appears inside the parentheses on the left of the function arrow, but not in the outer forall. That is, unsafePartial is a function from partial values to regular values.
@@ -568,7 +568,7 @@ Note that the Partial constraint appears inside the parentheses on the left of t
 
 ## lift Arbitrary Functions (7.4)
 
-```purescript
+```haskell
 -- <$>
 class Functor f where
   map :: forall a b. (a -> b) -> f a -> f b
@@ -581,7 +581,7 @@ class Functor f <= Apply f where
 
 Maybe implement apply class
 
-```purescript
+```haskell
 instance functorMaybe :: Functor Maybe where
   map f (Just a) = Just (f a)
   map f Nothing  = Nothing
@@ -591,7 +591,7 @@ instance applyMaybe :: Apply Maybe where
   apply _        _        = Nothing
 ```
 
-```purescript
+```haskell
 lift3 :: forall a b c d f. Apply f => 
     (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 lift3 f x y z = f <$> x <*> y <*> z
@@ -599,7 +599,7 @@ lift3 f x y z = f <$> x <*> y <*> z
 
 ## Applicative type class (7.5)
 
-```purescript
+```haskell
 class Functor f where
   map :: forall a b. (a -> b) -> f a -> f b
 
@@ -615,7 +615,7 @@ instance applicativeMaybe :: Applicative Maybe where
 
 ## More Effects (7.7)
 
-```purescript
+```haskell
 withError Nothing  err = Left err
 withError (Just a) _   = Right a
 
@@ -630,7 +630,7 @@ Maybe String -> Maybe String -> Maybe String -> Either String String
 
 ## Applicative Validation (7.9)
 
-```purescript
+```haskell
 address :: String -> String -> String -> Address
 
 phoneNumber :: PhoneType -> String -> PhoneNumber
@@ -652,7 +652,7 @@ examplePerson =
 
 The **Data.AddressBook.Validation** module uses the **V (Array String) **applicative functor to validate the data structures
 
-```purescript
+```haskell
 
 nonEmpty :: String -> String -> V Errors Unit
 nonEmpty field "" = invalid ["Field '" <> field <> "' cannot be empty"]
@@ -685,7 +685,7 @@ validatePhoneNumber (PhoneNumber o) =
 
 ## Traversable Functors (7.11)
 
-```purescript
+```haskell
 arrayNonEmpty :: forall a. String -> Array a -> V Errors Unit
 arrayNonEmpty field [] =
   invalid ["Field '" <> field <> "' must contain at least one value"]
@@ -701,13 +701,13 @@ validatePerson (Person o) =
 
 ```
 
-```purescript
+```haskell
 class (Functor t, Foldable t) <= Traversable t where
   traverse :: forall a b f. Applicative f => (a -> f b) -> t a -> f (t b)
   sequence :: forall a f. Applicative f => t (f a) -> f (t a)
 ```
 
-```purescript
+```haskell
 traverse :: forall a b f. Applicative f => (a -> f b) -> Array a -> f (Array b)
 traverse :: forall a b. (a -> V Errors b) -> Array a -> V Errors (Array b)
 ```
@@ -716,7 +716,7 @@ traverse :: forall a b. (a -> V Errors b) -> Array a -> V Errors (Array b)
 
 List implements
 
-```purescript
+```haskell
 -- traverse :: forall a b f. Applicative f => (a -> f b) -> List a -> f (List b)
 traverse _ Nil = pure Nil
 traverse f (Cons x xs) = Cons <$> f x <*> traverse f xs
@@ -725,7 +725,7 @@ traverse f (Cons x xs) = Cons <$> f x <*> traverse f xs
 
 ## Applicative Functors for Parallelism (7.12)
 
-```purescript
+```haskell
 f <$> parallel computation1
   <*> parallel computation2
 ```
@@ -733,9 +733,39 @@ This computation would start computing values asynchronously using computation1 
 
 # Chapter 8 The Eff Monad
 
+## 8.3 Monads and Do Notation
+
+```haskell
+import Prelude
+
+import Control.Plus (empty)
+import Data.Array ((..))
+
+countThrows :: Int -> Array (Array Int)
+countThrows n = do
+  x <- 1 .. 6
+  y <- 1 .. 6
+  if x + y == n
+    then pure [x, y]
+    else empty
+```
+
+> In general, every line of a do notation block will contain a computation of type m a for some type a and our monad m
+> The monad m must be the same on every line
+> the types a can differ (i.e. individual computations can have different result types)
+
+```haskell
+userCity :: XML -> Maybe XML
+userCity root = do
+  prof <- child root "profile"
+  addr <- child prof "address"
+  city <- child addr "city"
+  pure city
+```
+
 ## 8.4 Monad type class
 
-```purescript
+```haskell
 -- >>=
 class Apply m <= Bind m where
     bind :: forall a b. m a -> (a -> m b) -> m b
@@ -765,7 +795,7 @@ m >>= return ≡ m
 
 ## 8.6 Folding With Monads
 
-```purescript
+```haskell
 foldM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
 foldM _ a Nil = pure a
 foldM f a (b : bs) = do
@@ -775,7 +805,7 @@ foldM f a (b : bs) = do
 
 Example:
 
-```purescript
+```haskell
 import Data.List
 
 safeDivide :: Int -> Int -> Maybe Int
@@ -809,7 +839,7 @@ Simple example.
 
 This program uses do notation to combine two types of native effects provided by the Javascript runtime: random number generation and console IO.
 
-```purescript
+```haskell
 module Main where
 
 import Prelude
@@ -824,7 +854,7 @@ main = do
 
 ## 8.11 Extensible Effects
 
-```purescript
+```haskell
 > :type main
 forall eff. Eff (console :: CONSOLE, random :: RANDOM | eff) Unit
 ```
