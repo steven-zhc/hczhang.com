@@ -733,7 +733,7 @@ This computation would start computing values asynchronously using computation1 
 
 # Chapter 8 The Eff Monad
 
-## 8.3 Monads and Do Notation
+## Monads and Do Notation (8.3)
 
 ```haskell
 import Prelude
@@ -763,7 +763,7 @@ userCity root = do
   pure city
 ```
 
-## 8.4 Monad type class
+## Monad type class (8.4)
 
 ```haskell
 -- >>=
@@ -780,20 +780,78 @@ instance bindMaybe :: Bind Maybe where
     bind (Just a) f = f a
 ```
 
+> syntax suger
+
+all of the following statement are same
+
+```haskell
+do value <- someComputation
+   whatToDoNext
+
+bind someComputation \value -> whatToDoNext
+
+someComputation >>= \value -> whatToDoNext
+```
+
 ## 8.5 Monad Laws
 
 ```haskell
 -- Left identity
-return a >>= f ≡ f a
+pure a >>= f ≡ f a
 
 -- Right identity
-m >>= return ≡ m
+m >>= pure ≡ m
 
 -- Associativity
 (m >>= f) >>= g ≡ m >>= (\x -> f x >>= g)
 ```
 
+### Right identity
+
+It tells us that we can eliminate a call to pure if it is the last expression in a do notation block:
+
+```haskell
+do
+  x <- expr
+  pure x
+```
+
+The right-identity law says that this is equivalent to just expr.
+
+### Left identity
+
+we can eliminate a call to pure if it is the first expression in a do notation block:
+
+```haskell
+do
+  x <- pure y
+  next
+```
+
+This code is equivalent to next, after the name x has been replaced with the expression y.
+
+### Associativity
+
+It tells us how to deal with nested do notation blocks
+
+```haskell
+c1 = do
+  y <- do
+    x <- m1
+    m2
+  m3
+
+c2 = do
+  x <- m1
+  y <- m2
+  m3
+```
+
 ## 8.6 Folding With Monads
+
+**foldM** generalizes the foldl function that we met earlier to a monadic context.
+
+Intuitively, foldM performs a fold over a list in some context supporting some set of side-effects.
 
 ```haskell
 foldM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
@@ -822,6 +880,16 @@ foldM safeDivide 100 (fromFoldable [2, 0, 4])
 ## 8.7 Monads and Applicatives
 
 > Every instance of the Monad type class is also an instance of the Applicative type class
+
+```haskell
+ap :: forall m a b. Monad m => m (a -> b) -> m a -> m b
+ap mf ma = do
+  f <- mf
+  a <- ma
+  pure (f a)
+```
+
+> a monad has to combine its side-effects in sequence.
 
 ## 8.8 Native Effects
 
