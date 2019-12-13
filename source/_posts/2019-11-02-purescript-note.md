@@ -21,7 +21,7 @@ main = log "Hello, World!"
 
 # Chapter 3 Functions and Records
 
-## 3.3 Simple Types
+## Simple Types (3.3)
 
 Built-in types
 
@@ -49,7 +49,7 @@ add x y = x + y
 30
 ```
 
-## 3.4 Quantified Types
+## Quantified Types (3.4)
 
 ```purescript
 > :type flip
@@ -58,11 +58,11 @@ forall a b c. (a -> b -> c) -> b -> a -> c
 
 forall means universally quantified type
 
-## 3.5 Notes On Indentation
+## Notes On Indentation (3.5)
 
 PureScript code is indentation-sensitive
 
-## 3.6 Defining Our Types
+## Defining Our Types (3.6)
 
 ```purescript
 -- a record type
@@ -83,7 +83,7 @@ type AddressBook = List Entry
 > address = { street: "123 Fake St.", city: "Faketown", state: "CA" }
 ```
 
-## 3.7 Type Constructors and Kinds
+## Type Constructors and Kinds (3.7)
 
 **List** is an example of a type constructor.
 
@@ -103,11 +103,11 @@ Type -> Type
 Type
 ```
 
-## 3.11 Curried Functions
+## Curried Functions (3.11)
 
 Functions in PureScript take exactly one argument.
 
-## 3.12 Querying the Address Book
+## Querying the Address Book (3.12)
 
 ```purescript
 findEntry firstName lastName book = head $ filter filterEntry book
@@ -118,7 +118,7 @@ findEntry firstName lastName book = head $ filter filterEntry book
 
 Note that, just like for top-level declarations, it was not necessary to specify a type signature for filterEntry. However, doing so is recommended as a form of documentation.
 
-## 3.13 Infix Function Application
+## Infix Function Application (3.13)
 
 > head $ filter filterEntry book
 
@@ -135,7 +135,7 @@ apply f x = f x
 infixr 0 apply as $
 ```
 
-## 3.14 Function Composition
+## Function Composition (3.14)
 
 - **<<<** backwards composition
 - **>>>** forwards composition
@@ -153,7 +153,7 @@ filter filterEntry >>> head
 - purescript-foldable-traversable, which defines functions for folding arrays and other data structures
 - purescript-console, which defines functions for printing to the console
 
-## 4.4 Recursion on Array
+## Recursion on Array (4.4)
 
 - The null function returns true on an empty array
 
@@ -171,7 +171,7 @@ length arr =
     else 1 + length (unsafePartial tail arr)
 ```
 
-## 4.6 Infix Operators
+## Infix Operators (4.6)
 
 ```purescript
 > (\n -> n + 1) `map` [1, 2, 3, 4, 5]
@@ -184,7 +184,7 @@ length arr =
 [2, 3, 4, 5, 6]
 ```
 
-## 4.8 Flattening Arrays
+## Flattening Arrays (4.8)
 
 ```purescript
 > import Data.Array
@@ -202,7 +202,7 @@ forall a b. (a -> Array b) -> Array a -> Array b
 [1,1,2,4,3,9,4,16,5,25]
 ```
 
-## 4.10 Do Notation
+## Do Notation (4.10)
 
 **map** and **bind** allow us to write so-called **monad comprehensions**
 
@@ -214,7 +214,7 @@ factors n = filter (\xs -> product xs == n) $ do
   pure [i, j]
 ```
 
-## 4.11 Guards
+## Guards (4.11)
 
 ```purescript
 import Control.MonadZero (guard)
@@ -240,7 +240,7 @@ forall m. MonadZero m => Boolean -> m Unit
 
 That is, if guard is passed an expression which evaluates to true, then it returns an array with a single element. If the expression evaluates to false, then its result is empty.
 
-## 4.12 Folds
+## Folds (4.12)
 
 ```purescript
 > :type foldl
@@ -253,7 +253,7 @@ forall a b. (a -> b -> b) -> b -> Array a -> b
 15
 ```
 
-## 4.13 Tail Recursion
+## Tail Recursion (4.13)
 
 **purescript-free** and **purescript-tailrec** packages.
 
@@ -272,7 +272,7 @@ Prefer Folds to Explicit Recursion
 - **purescript-globals**, which provides access to some common JavaScript values and functions.
 - **purescript-math**, which provides access to the JavaScript Math module.
 
-## 5.3 Simple Pattern Matching
+## Simple Pattern Matching (5.3)
 
 ```purescript
 gcd :: Int -> Int -> Int
@@ -286,7 +286,7 @@ gcd n m = if n > m
 - Number, String, Char and Boolean literals
 - Wildcard patterns, indicated with an underscore (_), which match any argument, and which do not bind any names.
 
-## 5.5 Guards
+## Guards (5.5)
 
 ```purescript
 gcd :: Int -> Int -> Int
@@ -296,7 +296,7 @@ gcd n m | n > m     = gcd (n - m) m
         | otherwise = gcd n (m - n)
 ```
 
-## 5.6 Array Patterns
+## Array Patterns (5.6)
 
 ```purescript
 isEmpty :: forall a. Array a -> Boolean
@@ -308,7 +308,7 @@ takeFive [0, 1, a, b, _] = a * b
 takeFive _ = 0
 ```
 
-## 5.7 Record Patterns and Row Polymorphism
+## Record Patterns and Row Polymorphism (5.7)
 
 ```purescript
 showPerson :: { first :: String, last :: String } -> String
@@ -329,7 +329,7 @@ Notice: what is the type variable r here?
 
 This function is polymorphic in the row r of record fields, hence the name row polymorphism.
 
-## 5.8 Nested Patterns
+## Nested Patterns (5.8)
 
 ```purescript
 type Address = { street :: String, city :: String }
@@ -341,7 +341,7 @@ livesInLA { address: { city: "Los Angeles" } } = true
 livesInLA _ = false
 ```
 
-## 5.9 Named Patterns
+## Named Patterns (5.9)
 
 ```purescript
 sortPair :: Array Int -> Array Int
@@ -351,7 +351,7 @@ sortPair arr@[x, y]
 sortPair arr = arr
 ```
 
-## 5.10 Case Expressions
+## Case Expressions (5.10)
 
 ```purescript
 import Data.Array.Partial (tail)
@@ -364,17 +364,19 @@ lzs xs = case sum xs of
            _ -> lzs (unsafePartial tail xs)
 ```
 
-## 5.12 Algebraic Data Types
+## Algebraic Data Types (5.12)
 
 Algebraic Data Types (or ADTs)
 
 ```purescript
+-- OR
 data Shape
   = Circle Point Number
   | Rectangle Point Number Number
   | Line Point Point
   | Text Point String
 
+-- AND
 data Point = Point
   { x :: Number
   , y :: Number
@@ -386,7 +388,7 @@ data Maybe a = Nothing | Just a
 data List a = Nil | Cons a (List a)
 ```
 
-## 5.13 Using ADTs
+## Using ADTs (5.13)
 
 ```purescript
 showPoint :: Point -> String
@@ -402,7 +404,7 @@ showShape (Line start end)  = ...
 showShape (Text p text) = ...
 ```
 
-## 5.15 Newtypes
+## Newtypes (5.15)
 
 There is an important special case of **algebraic data types (ADT)**, called newtypes
 
@@ -416,7 +418,155 @@ newtype Pixels = Pixels Number
 
 > Newtypes will become important, since they allow us to attach different behavior to a type without changing its representation at runtime.
 
+# Chapter 6 Type Classes
+
+## Show Me (6.3)
+
+```purescript
+class Show a where
+  show :: a -> String
+
+instance showBoolean :: Show Boolean where
+  show true = "true"
+  show false = "false"
+```
+
+We can annotate the expression with a type, using the :: operator, so that PSCi can choose the correct type class instance:
+
+```purescript
+> show (Left 10 :: Either Int String)
+"(Left 10)"
+```
+
+## Common Type Classes (6.4)
+
+```purescript
+class Eq a where
+  eq :: a -> a -> Boolean
+
+-- Ord
+data Ordering = LT | EQ | GT
+
+class Eq a <= Ord a where
+  compare :: a -> a -> Ordering
+
+-- The Field type class identifies those types which support numeric operators such as addition, subtraction, multiplication and division. It is provided to abstract over those operators
+class EuclideanRing a <= Field a
+
+-- purescript-monoid
+-- Semigroups and Monoids
+-- <> is as an alias for append
+class Semigroup a where
+  append :: a -> a -> a
+
+class Semigroup m <= Monoid m where
+  mempty :: m
+
+-- purescript-foldable-traversable
+-- Foldable
+class Foldable f where
+  foldr :: forall a b. (a -> b -> b) -> b -> f a -> b
+  foldl :: forall a b. (b -> a -> b) -> b -> f a -> b
+  foldMap :: forall a m. Monoid m => (a -> m) -> f a -> m
+
+-- Functor
+-- alias <$>
+class Functor f where
+  map :: forall a b. (a -> b) -> f a -> f b
+```
+
+```purescript
+> import Data.Monoid
+> import Data.Foldable
+
+> foldl append mempty ["Hello", " ", "World"]  
+"Hello World"
+```
+
+Functor Law
+
+- **identity law:** map id xs = xs
+- **composition law:** map g (map f xs) = map (g <<< f) xs
+
+## Type Annotations (6.5)
+
+```purescript
+threeAreEqual :: forall a. Eq a => a -> a -> a -> Boolean
+threeAreEqual a1 a2 a3 = a1 == a2 && a2 == a3
+
+showCompare :: forall a. Ord a => Show a => a -> a -> String
+showCompare a1 a2 | a1 < a2 =
+  show a1 <> " is less than " <> show a2
+showCompare a1 a2 | a1 > a2 =
+  show a1 <> " is greater than " <> show a2
+showCompare a1 a2 =
+  show a1 <> " is equal to " <> show a2
+```
+
+## Instance Dependencies (6.7)
+
+```purescript
+instance showEither :: (Show a, Show b) => Show (Either a b) where
+  ...
+```
+
+## Multi Parameter Type Classes (6.8)
+
+```purescript
+module Stream where
+
+import Data.Array as Array
+import Data.Maybe (Maybe)
+import Data.String as String
+
+class Stream stream element where
+  uncons :: stream -> Maybe { head :: element, tail :: stream }
+
+instance streamArray :: Stream (Array a) a where
+  uncons = Array.uncons
+
+instance streamString :: Stream String Char where
+  uncons = String.uncons
+```
+
+## Functional Dependencies (6.9)
+
+```purescript
+class Stream stream element | stream -> element where
+  uncons :: stream -> Maybe { head :: element, tail :: stream }
+
+genericTail xs = map _.tail (uncons xs)
+
+> :type genericTail
+forall stream element. Stream stream element => stream -> Maybe stream
+
+> genericTail "testing"
+(Just "esting")
+```
+
+## Nullary Type Classes (6.10)
+
+```purescript
+head :: forall a. Partial => Array a -> a
+
+tail :: forall a. Partial => Array a -> Array a
+```
+
+Note that there is no instance defined for the Partial type class! Doing so would defeat its purpose: attempting to use the head function directly will result in a type error:
+
+```purescript
+secondElement :: forall a. Partial => Array a -> a
+secondElement xs = head (tail xs)
+```
+
+```purescript
+unsafePartial :: forall a. (Partial => a) -> a
+```
+Note that the Partial constraint appears inside the parentheses on the left of the function arrow, but not in the outer forall. That is, unsafePartial is a function from partial values to regular values.
+
 # Chapter 7 Applicative Validation
+
+## lift (7.4)
 
 ```purescript
 -- <$>
@@ -441,15 +591,13 @@ instance applyMaybe :: Apply Maybe where
   apply _        _        = Nothing
 ```
 
-## lift
-
 ```purescript
 lift3 :: forall a b c d f. Apply f => 
     (a -> b -> c -> d) -> f a -> f b -> f c -> f d
 lift3 f x y z = f <$> x <*> y <*> z
 ```
 
-## Applicative type class
+## Applicative type class (7.5)
 
 ```purescript
 class Apply f <= Applicative f where
