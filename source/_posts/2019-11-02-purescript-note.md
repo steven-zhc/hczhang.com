@@ -566,7 +566,7 @@ Note that the Partial constraint appears inside the parentheses on the left of t
 
 # Chapter 7 Applicative Validation
 
-## lift (7.4)
+## lift Arbitrary Functions (7.4)
 
 ```purescript
 -- <$>
@@ -600,9 +600,20 @@ lift3 f x y z = f <$> x <*> y <*> z
 ## Applicative type class (7.5)
 
 ```purescript
+class Functor f where
+  map :: forall a b. (a -> b) -> f a -> f b
+
+class Functor f <= Apply f where
+  apply :: forall a b. f (a -> b) -> f a -> f b
+
 class Apply f <= Applicative f where
     pure :: forall a. a -> f a
+
+instance applicativeMaybe :: Applicative Maybe where
+  pure x = Just x
 ```
+
+## More Effects (7.7)
 
 ```purescript
 withError Nothing  err = Left err
@@ -612,7 +623,113 @@ fullNameEither first middle last =
    fullName <$> (first  `withError` "First name was missing")
             <*> (middle `withError` "Middle name was missing")
             <*> (last   `withError` "Last name was missing")
+
+> :type fullNameEither
+Maybe String -> Maybe String -> Maybe String -> Either String String
 ```
+
+## Applicative Validation (7.9)
+
+```purescript
+address :: String -> String -> String -> Address
+
+phoneNumber :: PhoneType -> String -> PhoneNumber
+
+person :: String -> String -> Address -> Array PhoneNumber -> Person
+
+data PhoneType = HomePhone | WorkPhone | CellPhone | OtherPhone
+
+examplePerson :: Person
+examplePerson =
+  person "John" "Smith"
+        (address "123 Fake St." "FakeTown" "CA")
+        [ phoneNumber HomePhone "555-555-5555"
+         , phoneNumber CellPhone "555-555-0000"
+        ]
+```
+
+> purescript-validation
+
+The **Data.AddressBook.Validation** module uses the **V (Array String) **applicative functor to validate the data structures
+
+```purescript
+
+nonEmpty :: String -> String -> V Errors Unit
+nonEmpty field "" = invalid ["Field '" <> field <> "' cannot be empty"]
+nonEmpty _     _  = pure unit
+
+lengthIs :: String -> Number -> String -> V Errors Unit
+lengthIs field len value | S.length value /= len =
+  invalid ["Field '" <> field <> "' must have length " <> show len]
+lengthIs _     _   _     =
+  pure unit
+
+matches :: String -> R.Regex -> String -> V Errors Unit
+matches _     regex value | R.test regex value =
+  pure unit
+matches field _     _     =
+  invalid ["Field '" <> field <> "' did not match the required format"]
+
+validateAddress :: Address -> V Errors Address
+validateAddress (Address o) =
+  address <$> (nonEmpty "Street" o.street *> pure o.street)
+          <*> (nonEmpty "City"   o.city   *> pure o.city)
+          <*> (lengthIs "State" 2 o.state *> pure o.state)
+
+validatePhoneNumber :: PhoneNumber -> V Errors PhoneNumber
+validatePhoneNumber (PhoneNumber o) =
+  phoneNumber <$> pure o."type"
+              <*> (matches "Number" phoneNumberRegex o.number *> pure o.number)
+
+```
+
+## Traversable Functors (7.11)
+
+```purescript
+arrayNonEmpty :: forall a. String -> Array a -> V Errors Unit
+arrayNonEmpty field [] =
+  invalid ["Field '" <> field <> "' must contain at least one value"]
+arrayNonEmpty _     _  =
+  pure unit
+
+validatePerson :: Person -> V Errors Person
+validatePerson (Person o) =
+  person <$> (nonEmpty "First Name" o.firstName *> pure o.firstName)
+         <*> (nonEmpty "Last Name"  o.lastName  *> pure o.lastName)
+	       <*> validateAddress o.address
+         <*> (arrayNonEmpty "Phone Numbers" o.phones *> traverse validatePhoneNumber o.phones)
+
+```
+
+```purescript
+class (Functor t, Foldable t) <= Traversable t where
+  traverse :: forall a b f. Applicative f => (a -> f b) -> t a -> f (t b)
+  sequence :: forall a f. Applicative f => t (f a) -> f (t a)
+```
+
+```purescript
+traverse :: forall a b f. Applicative f => (a -> f b) -> Array a -> f (Array b)
+traverse :: forall a b. (a -> V Errors b) -> Array a -> V Errors (Array b)
+```
+
+> Traversable functors capture the idea of traversing a data structure, collecting a set of effectful computations, and combining their effects. In fact, sequence and traverse are equally important to the definition of Traversable - each can be implemented in terms of each other
+
+List implements
+
+```purescript
+-- traverse :: forall a b f. Applicative f => (a -> f b) -> List a -> f (List b)
+traverse _ Nil = pure Nil
+traverse f (Cons x xs) = Cons <$> f x <*> traverse f xs
+
+```
+
+## Applicative Functors for Parallelism (7.12)
+
+```purescript
+f <$> parallel computation1
+  <*> parallel computation2
+```
+This computation would start computing values asynchronously using computation1 and computation2. When both results have been computed, they would be combined into a single result using the function f.
 
 # Chapter 8 The Eff Monad
 
