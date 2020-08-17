@@ -6,9 +6,10 @@ photos:
     - https://photos.app.goo.gl/tkutMfjVERysmrut8
 ---
 
-Domain Modeling Made Functional - Chapter 4
+# Domain Modeling Made Functional - Chapter 4
 
-Understand types in F#
+## Understand F# types
+
 <!--more-->
 
 ```haskell
