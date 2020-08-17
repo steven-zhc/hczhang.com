@@ -3,7 +3,7 @@ title: fp-ddd chapter 4
 date: 2020-08-16 02:04:01
 tags: [fp, f#]
 photos:
-    - https://photos.app.goo.gl/tkutMfjVERysmrut8
+    - https://flic.kr/p/2jx9WYy
 ---
 
 # Domain Modeling Made Functional - Chapter 4
