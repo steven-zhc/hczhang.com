@@ -17,6 +17,8 @@ we’re using a namespace in F# to indicate a DDD bounded context
 ```haskell
 namespace​ OrderTaking.Domain
 
+type Undefined = exn
+
 type WidgetCode = WidgetCode of string
 type GizmoCode = GizmoCode of string
 type ProductCode =
@@ -33,7 +35,6 @@ type OrderId = Undefined
 type OrderLineId = Undefined
 type CustomerId = Undefined
 
-type CustomerInfo = Undefined
 type CustomerInfo = Undefined
 type ShippingAddress = Undefined
 type ShippingAddress = Undefined
@@ -83,6 +84,6 @@ and ValidationError = {
 }
 
 // The "place order" process
-type PlaceOrder = 
+type PlaceOrder =
   UnvalidatedOrder -> Result<PlaceOrderEvents, PlaceOrderError>
 ```
