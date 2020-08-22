@@ -1,7 +1,7 @@
 ---
 title: fp-ddd chapter 4
 date: 2020-08-16 02:04:01
-tags: [fp, f#]
+tags: [fp, f#, ddd]
 photos:
     - https://live.staticflickr.com/65535/50235671576_a3090a7059_z.jpg
 ---
