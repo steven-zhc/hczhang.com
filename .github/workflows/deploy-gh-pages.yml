@@ -30,6 +30,13 @@ jobs:
       - name: Install
         run: npm install --omit=optional
 
+      - name: Patch legacy hexo-front-matter for modern Node
+        run: |
+          FILE="node_modules/hexo-front-matter/lib/front_matter.js"
+          if [ -f "$FILE" ]; then
+            sed -i.bak "s/var isDate = util.isDate;/var isDate = (util.types \&\& util.types.isDate) || util.isDate || function(obj){ return obj instanceof Date; };/" "$FILE" || true
+          fi
+
       - name: Build (Hexo generate)
         run: npx hexo generate
 
